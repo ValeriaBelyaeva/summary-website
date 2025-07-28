@@ -1,0 +1,18 @@
+{
+  "header": {
+    "name": "СПИ-саллухе",
+    "subheader": "ML Developer"
+  },
+  "contacts": {
+    "telegram": "TELEGRAM",
+    "email": "email@example.com"
+  },
+  "skills": {
+    "textHeader": "SKILLS",
+    "textBody": "Lorem ipsum dolor sit amet, consectetur. Lorem ipsum dolor sit amet, consectetur."
+  },
+  "experience": {
+    "textHeader": "EXPERIENCE",
+    "textBody": "Lorem ipsum dolor sit amet, consectetur sit amet, consectetur."
+  }
+}

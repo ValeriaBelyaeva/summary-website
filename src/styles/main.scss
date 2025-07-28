@@ -1,0 +1,38 @@
+/* Базовый сброс и стили */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F3F3F3; /* COLOR_BACKGROUND_LIGHT */
+    color: #1E1E1E; /* COLOR_TEXT_ON_LIGHT */
+    overflow-x: hidden;
+  }
+  
+  #app-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  /* Стили для компонентов (будут расширяться) */
+  .header, .skills-block, .experience-block {
+    width: 100%;
+    padding: 40px 60px;
+    color: #FDFDFD; /* COLOR_TEXT_ON_DARK */
+  }
+  
+  .header {
+    background-color: #1E1E1E; /* COLOR_BACKGROUND_DARK */
+  }
+  
+  .skills-block {
+    background-color: #F58A07; /* COLOR_BACKGROUND_ACCENT */
+    /* Здесь будет логика для 60% ширины */
+  }
+  
+  .experience-block {
+    background-color: #1E1E1E; /* COLOR_BACKGROUND_DARK */
+  }
