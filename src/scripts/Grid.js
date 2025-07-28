@@ -1,119 +1,240 @@
 /**
- * @fileoverview Manages the creation and state of the background grid.
- * This version draws the entire grid statically on initialization
- * but is structured to support future animation.
+ * @fileoverview Manages the creation and DYNAMIC animation of the background grid.
+ * This is the final, functional implementation.
  */
+
+// Enum for the state of each line segment
+const SEGMENT_STATE = {
+    PENDING: 0,   // Scheduled for drawing, not yet started
+    DRAWING: 1,   // Currently being animated
+    FINISHED: 2,  // Animation complete, fully visible
+    ERASING: 3,   // Being erased (animated in reverse)
+};
 
 export class Grid {
     /**
-     * Creates an instance of the Grid.
-     * @param {object} options - Configuration options for the grid.
+     * Creates an instance of the Grid animation controller.
+     * @param {object} options - Configuration options.
+     * @param {number} options.drawingSpeed - Speed of line drawing in pixels per second.
      */
     constructor(options = {}) {
         this.options = {
-            lineColor: '#1E1E1E', // COLOR_GRID_LINE
+            drawingSpeed: 400, // Default speed: 400px per second
+            lineColor: '#1E1E1E',
             lineWidth: 1,
-            ...options
+            ...options,
         };
+        
         this.canvas = null;
         this.ctx = null;
-        this.gridSegments = []; // Will store all line segments [x1, y1, x2, y2]
+        
+        // The core state management object. Maps a unique ID to a segment's state.
+        this.segments = new Map();
+
+        this.lastTimestamp = 0;
+        this.isAnimationLoopRunning = false;
     }
 
     /**
-     * Initializes the grid canvas and performs the initial static draw.
+     * Initializes the canvas and starts the animation loop.
      * @param {HTMLElement} container - The element to append the canvas to.
      */
     init(container) {
         this.canvas = document.createElement('canvas');
-        this.canvas.style.position = 'absolute'; // Absolute to scroll with the page
+        this.canvas.style.position = 'absolute';
         this.canvas.style.top = '0';
         this.canvas.style.left = '0';
-        this.canvas.style.zIndex = '-1'; // Behind all content
-        container.prepend(this.canvas); // Prepend to be behind other children
+        this.canvas.style.zIndex = '-1';
+        container.prepend(this.canvas);
         
         this.ctx = this.canvas.getContext('2d');
-        
-        this.onResize(); // Set initial size
+        this.onResize();
+
+        this.startAnimationLoop();
     }
 
     /**
-     * Calculates all segments from component bounding boxes and triggers a redraw.
-     * This is the main method to generate the grid geometry.
-     * @param {Array<HTMLElement>} components - An array of all rendered component elements.
+     * The main animation loop, powered by requestAnimationFrame.
+     * @param {number} timestamp - The current time provided by the browser.
      */
-    buildFromComponents(components) {
-        this.gridSegments = []; // Clear previous segments
-        const viewportWidth = document.documentElement.clientWidth;
+    animationLoop(timestamp) {
+        if (!this.isAnimationLoopRunning) return;
 
-        components.forEach(el => {
-            const rect = el.getBoundingClientRect();
-            const top = rect.top + window.scrollY;
-            const bottom = rect.bottom + window.scrollY;
-            const left = rect.left + window.scrollX;
-            const right = rect.right + window.scrollX;
+        const deltaTime = (timestamp - this.lastTimestamp) || 0;
+        this.lastTimestamp = timestamp;
 
-            // Add segments for the component's bounding box
-            // We ensure no duplicate lines are added by checking existence later,
-            // but for now, we just add all logical lines.
-            this.gridSegments.push([left, top, right, top]); // Top line
-            this.gridSegments.push([left, bottom, right, bottom]); // Bottom line
-            this.gridSegments.push([left, top, left, bottom]); // Left line
-            this.gridSegments.push([right, top, right, bottom]); // Right line
-        });
-        
-        // Connect to screen edges if needed
-        const headerRect = components[0].getBoundingClientRect();
-        this.gridSegments.push([0, headerRect.bottom + window.scrollY, viewportWidth, headerRect.bottom + window.scrollY]);
-
-        this.draw(); // Draw the newly calculated grid
-    }
-
-    /**
-     * Draws all stored grid segments onto the canvas at once.
-     * In an animated version, this would be inside a requestAnimationFrame loop.
-     */
-    draw() {
-        if (!this.ctx) return;
-        
-        // Clear previous drawing
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
         this.ctx.strokeStyle = this.options.lineColor;
         this.ctx.lineWidth = this.options.lineWidth;
         
-        this.ctx.beginPath();
-        this.gridSegments.forEach(([x1, y1, x2, y2]) => {
-            this.ctx.moveTo(x1, y1);
-            this.ctx.lineTo(x2, y2);
-        });
-        this.ctx.stroke();
+        for (const segment of this.segments.values()) {
+            this.updateSegment(segment, deltaTime);
+            this.drawSegment(segment);
+        }
+
+        requestAnimationFrame((ts) => this.animationLoop(ts));
     }
     
     /**
-     * Checks if a given rectangular area is fully encompassed by the grid.
-     * This is the "hook" for future animation checks.
-     * @param {DOMRect} rect - The bounding rectangle of a component to check.
-     * @returns {boolean} - For this static version, it always returns true.
+     * Updates a single segment's properties based on its state and delta time.
+     * @param {object} segment - The segment state object.
+     * @param {number} deltaTime - Time elapsed since the last frame in milliseconds.
      */
-    isAreaReady(rect) {
-        // In a dynamic version, we would check if the lines around this rect
-        // have finished their "growing" animation.
-        // For now, since the grid is drawn instantly, any area is always "ready".
-        return true;
+    updateSegment(segment, deltaTime) {
+        const growth = (deltaTime / 1000) * this.options.drawingSpeed;
+
+        if (segment.state === SEGMENT_STATE.DRAWING) {
+            segment.currentLength += growth;
+            if (segment.currentLength >= segment.length) {
+                segment.currentLength = segment.length;
+                segment.state = SEGMENT_STATE.FINISHED;
+            }
+        } else if (segment.state === SEGMENT_STATE.ERASING) {
+            segment.currentLength -= growth * 1.25; // Erase 25% faster
+            if (segment.currentLength <= 0) {
+                this.segments.delete(segment.id); // Remove completely
+            }
+        }
     }
 
     /**
-     * Handles window resize event.
-     * Recalculates canvas size and triggers a redraw.
+     * Renders a single segment on the canvas based on its current length.
+     * @param {object} segment - The segment to draw.
      */
+    drawSegment(segment) {
+        if (segment.currentLength <= 0) return;
+
+        const ratio = segment.length > 0 ? segment.currentLength / segment.length : 1;
+        
+        const currentX = segment.x1 + (segment.x2 - segment.x1) * ratio;
+        const currentY = segment.y1 + (segment.y2 - segment.y1) * ratio;
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(segment.x1, segment.y1);
+        this.ctx.lineTo(currentX, currentY);
+        this.ctx.stroke();
+    }
+
+    /**
+     * PUBLIC API: Starts the initial animation from given points.
+     * @param {Array<{x: number, y: number}>} startPoints - Array of starting points.
+     * @param {number} length - The initial length for the vertical lines.
+     * @returns {Array<string>} An array of the new segment IDs.
+     */
+    startInitialDraw(startPoints, length = 300) {
+        const newSegmentIds = [];
+        startPoints.forEach(p => {
+            const id = this.addSegment(p.x, p.y, p.x, p.y + length);
+            newSegmentIds.push(id);
+        });
+        return newSegmentIds;
+    }
+
+    /**
+     * PUBLIC API: Creates a horizontal branch from a vertical line.
+     * @param {number} y - The Y coordinate for the branch.
+     * @param {number} x_left - The leftmost X coordinate.
+     * @param {number} x_right - The rightmost X coordinate.
+     * @param {number} from_x - The X coordinate of the vertical line to branch from.
+     * @returns {Array<string>} An array of the new segment IDs.
+     */
+    drawBranch(y, x_left, x_right, from_x) {
+        const ids = [
+            this.addSegment(from_x, y, x_left, y), // Left horizontal
+            this.addSegment(from_x, y, x_right, y) // Right horizontal
+        ];
+        return ids;
+    }
+    
+    /**
+     * PUBLIC API: Checks if an area, defined by its bounding segments, is fully drawn.
+     * @param {Array<string>} segmentIds - The IDs of segments that bound a component.
+     * @returns {boolean} - True if all segments are in the FINISHED state.
+     */
+    isAreaReady(segmentIds) {
+        if (!segmentIds || segmentIds.length === 0) return false;
+        
+        return segmentIds.every(id => {
+            const segment = this.segments.get(id);
+            return segment && segment.state === SEGMENT_STATE.FINISHED;
+        });
+    }
+
+    /**
+     * PUBLIC API: Triggers the erasing animation for given segments.
+     * @param {Array<string>} segmentIds - The IDs of segments to erase.
+     */
+    eraseSegments(segmentIds) {
+        segmentIds.forEach(id => {
+            const segment = this.segments.get(id);
+            if (segment) {
+                segment.state = SEGMENT_STATE.ERASING;
+            }
+        });
+    }
+
+    /**
+     * Builds grid segments based on the geometry of rendered components.
+     * @param {HTMLElement[]} elements - Array of DOM elements to build grid around.
+     */
+    buildFromComponents(elements) {
+        // Clear existing segments
+        this.segments.clear();
+        
+        // Create grid segments around each element
+        elements.forEach(element => {
+            const rect = element.getBoundingClientRect();
+            
+            // Add horizontal lines above and below the element
+            this.addSegment(0, rect.top - 20, this.canvas.width, rect.top - 20);
+            this.addSegment(0, rect.bottom + 20, this.canvas.width, rect.bottom + 20);
+            
+            // Add vertical lines to the left and right of the element
+            this.addSegment(rect.left - 20, 0, rect.left - 20, this.canvas.height);
+            this.addSegment(rect.right + 20, 0, rect.right + 20, this.canvas.height);
+        });
+        
+        // Start drawing the segments
+        this.startInitialDraw();
+    }
+
+    // --- Internal and Helper Methods ---
+
+    /**
+     * Adds a new segment to the state, ensuring no duplicates.
+     * @private
+     */
+    addSegment(x1, y1, x2, y2) {
+        const id = `s_${x1}_${y1}_${x2}_${y2}`;
+        if (this.segments.has(id)) return id;
+
+        this.segments.set(id, {
+            id, x1, y1, x2, y2,
+            length: Math.hypot(x2 - x1, y2 - y1),
+            currentLength: 0,
+            state: SEGMENT_STATE.DRAWING,
+        });
+        return id;
+    }
+    
+    startAnimationLoop() {
+        if (this.isAnimationLoopRunning) return;
+        this.isAnimationLoopRunning = true;
+        this.lastTimestamp = performance.now();
+        requestAnimationFrame((ts) => this.animationLoop(ts));
+    }
+    
     onResize() {
-        // Set canvas size to match the entire document scrollable area
         this.canvas.width = document.documentElement.scrollWidth;
         this.canvas.height = document.documentElement.scrollHeight;
-        
-        // A redraw would be needed if components are rebuilt on resize
-        // For now, we just ensure canvas is correctly sized.
-        this.draw();
+    }
+    
+    /**
+     * Clears all segments and stops animation. Used for full rebuilds.
+     */
+    destroy() {
+        this.isAnimationLoopRunning = false;
+        this.segments.clear();
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 }

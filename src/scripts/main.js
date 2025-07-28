@@ -2,12 +2,12 @@
  * @fileoverview Main entry point for the application.
  */
 
-import { loadContent } from '/src/scripts/services/contentLoader.js';
-import { Header } from '/src/components/Header.js';
-import { SkillsBlock } from '/src/components/SkillsBlock.js';
-import { ExperienceBlock } from '/src/components/ExperienceBlock.js';
-import { Grid } from '/src/scripts/Grid.js';
-import { throttle, debounce } from '/src/utils/events.js';
+import { loadContent } from './services/contentLoader.js';
+import { Header } from '../components/Header.js';
+import { SkillsBlock } from '../content/SkillsBlock.js';
+import { ExperienceBlock } from '../components/ExperienceBlock.js';
+import { Grid } from './Grid.js';
+import { throttle, debounce } from '../utils/events.js';
 
 class App {
     constructor(rootSelector) {
@@ -81,14 +81,10 @@ class App {
     
     _revealComponents() {
         this.renderedElements.forEach(el => {
-            const rect = el.getBoundingClientRect();
-            
-            // This is the check for animation readiness.
-            // In this static version, it will always be true.
-            if (this.grid.isAreaReady(rect)) {
-                el.style.transition = 'opacity 0.5s';
-                el.style.opacity = '1';
-            }
+            // For now, always reveal components since we're not tracking specific segments
+            // In a more complex implementation, you'd track which segments belong to which component
+            el.style.transition = 'opacity 0.5s';
+            el.style.opacity = '1';
         });
     }
 

@@ -12,7 +12,7 @@ import { logging } from '../../utils/logging.js';
  */
 export async function loadContent() {
     // Path to the content file.
-    const contentPath = '/src/content/content.json';
+    const contentPath = '/content/content.json';
 
     try {
         // Fetching the content file.
