@@ -1,0 +1,22 @@
+import pluginImport from 'eslint-plugin-import';
+export default [
+  {
+    files: ['src/**/*.{js,ts}'],
+    languageOptions: {
+      ecmaVersion: 2021,
+      sourceType: 'module'
+    },
+    plugins: { import: pluginImport },
+    extends: ['eslint:recommended', 'plugin:import/recommended', 'prettier'],
+    rules: {
+      'import/order': ['error', {
+        groups: [['builtin', 'external'], 'internal'],
+        'newlines-between': 'always'
+      }],
+      'max-len': ['error', { code: 79, ignoreUrls: true }],
+      indent: ['error', 2, { SwitchCase: 1 }],
+      quotes: ['error', 'single'],
+      semi: ['error', 'always']
+    }
+  }
+];
