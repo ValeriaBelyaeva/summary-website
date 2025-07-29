@@ -1,63 +1,96 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <!-- Основная кодировка и настройки viewport для адаптивности -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Интерактивное Резюме</title>
-    <!-- Подключаем шрифты -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Подключаем основной файл стилей -->
+
+    <!-- Иконка сайта -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+
+    <!-- Название страницы, которое отображается во вкладке браузера -->
+    <title>Интерактивное резюме | ML Developer</title>
+
+    <!-- Подключение основного файла стилей (Vite обработает SCSS) -->
     <link rel="stylesheet" href="/src/styles/main.scss" />
 </head>
 <body>
-    <!-- 
-      Это главный контейнер приложения. 
-      В него помещена базовая структура страницы (скелет), 
-      которую JavaScript будет находить и заполнять данными.
-    -->
-    <div id="app-container">
 
-        <!-- Шапка (Header) -->
-        <header class="header component">
-            <div class="header__content">
-                <h1 class="header__name" data-content-key="header.name"></h1>
-                <p class="header__title" data-content-key="header.title"></p>
-                <div class="header__contacts">
-                    <p class="header__contact-item" data-content-key="contacts.telegram"></p>
-                    <p class="header__contact-item" data-content-key="contacts.email"></p>
-                </div>
+    <!-- 
+      Этот контейнер предназначен специально для <canvas> сетки. 
+      Он будет позиционирован позади всего контента через CSS. 
+    -->
+    <div id="grid-canvas-container"></div>
+
+    <!-- 
+      Блок "Шапка": первая видимая часть страницы.
+      Содержит основную информацию о специалисте.
+    -->
+    <header class="header">
+        <div class="header__content">
+            <!-- Динамический контент будет вставлен сюда через JS -->
+            <!-- Пример того, что должно здесь появиться: -->
+            <!--
+            <h1 class="header__name">СПИ-САЛЛУХЕ</h1>
+            <p class="header__subtitle">ML Developer</p>
+            <div class="header__contacts">
+                <p>TELEGRAM</p>
+                <p>email@example.com</p>
             </div>
-        </header>
+            -->
+        </div>
+    </header>
+
+    <!-- 
+      Основное содержимое страницы.
+      Включает все последующие информационные блоки.
+    -->
+    <main class="main-content">
 
         <!-- 
-          Ряд с блоками Skills и Пустым.
-          Эта обертка `.content-row` необходима для создания flex-контейнера,
-          который разместит дочерние блоки в соотношении 60% / 40%.
+          Секция "Навыки": состоит из двух колонок.
+          Левая (60%) - оранжевый блок с информацией.
+          Правая (40%) - пустой фоновый блок для поддержания сетки.
         -->
-        <div class="content-row">
-            <!-- Блок Навыков (Skills) -->
-            <section class="skills-block component">
-                <h2 class="skills-block__header" data-content-key="skills.header"></h2>
-                <div class="skills-block__body" data-content-key="skills.body"></div>
-            </section>
-            <!-- 
-              Пустой блок. Он не несет контента, но является ключевой частью 
-              геометрии макета и сетки.
-            -->
-            <div class="empty-block component"></div>
-        </div>
-
-        <!-- Блок Опыта (Experience) -->
-        <section class="experience-block component">
-            <h2 class="experience-block__header" data-content-key="experience.header"></h2>
-            <div class="experience-block__body" data-content-key="experience.body"></div>
+        <section class="skills-section">
+            <div class="skills-block">
+                <!-- Динамический контент для блока "Skills" -->
+                <!-- Пример того, что должно здесь появиться: -->
+                <!-- 
+                <h2 class="skills-block__header">SKILLS</h2>
+                <p class="skills-block__body">Lorem ipsum dolor sit amet, consectetur</p>
+                <p class="skills-block__body">Lorem ipsum dolor sit amet, consectetur</p>
+                -->
+            </div>
+            <div class="placeholder-block">
+                <!-- Этот блок намеренно оставлен пустым для визуальной структуры -->
+            </div>
         </section>
 
-    </div>
-    
-    <!-- Это главный скрипт нашего приложения -->
+        <!-- 
+          Секция "Опыт работы": полноширинный блок.
+        -->
+        <section class="experience-section">
+            <div class="experience-block">
+                <!-- Динамический контент для блока "Experience" -->
+                <!-- Пример того, что должно здесь появиться: -->
+                <!-- 
+                <h2 class="experience-block__header">EXPERIENCE</h2>
+                <p class="experience-block__body">Lorem ipsum dolor sit amet, consectetur</p>
+                -->
+            </div>
+        </section>
+
+        <!-- Можно добавлять другие секции по аналогии -->
+
+    </main>
+
+    <!-- 
+      Подключение главного управляющего скрипта.
+      Атрибут type="module" обязателен для работы с импортами.
+      Скрипт загружается в конце, чтобы гарантировать отрисовку всего DOM.
+    -->
     <script type="module" src="/src/scripts/main.js"></script>
+
 </body>
 </html>
