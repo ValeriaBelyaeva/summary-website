@@ -1,38 +1,89 @@
-/* Базовый сброс и стили */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: 'Inter', sans-serif;
-    background-color: #F3F3F3; /* COLOR_BACKGROUND_LIGHT */
-    color: #1E1E1E; /* COLOR_TEXT_ON_LIGHT */
-    overflow-x: hidden;
-  }
-  
-  #app-container {
-    position: relative;
-    width: 100%;
-  }
-  
-  /* Стили для компонентов (будут расширяться) */
-  .header, .skills-block, .experience-block {
-    width: 100%;
-    padding: 40px 60px;
-    color: #FDFDFD; /* COLOR_TEXT_ON_DARK */
-  }
-  
-  .header {
-    background-color: #1E1E1E; /* COLOR_BACKGROUND_DARK */
-  }
-  
-  .skills-block {
-    background-color: #F58A07; /* COLOR_BACKGROUND_ACCENT */
-    /* Здесь будет логика для 60% ширины */
-  }
-  
-  .experience-block {
-    background-color: #1E1E1E; /* COLOR_BACKGROUND_DARK */
-  }
+/* --- ОБЩИЕ СТИЛИ И ПЕРЕМЕННЫЕ --- */
+:root {
+  --color-bg-dark: #1E1E1E;
+  --color-bg-accent: #F58A07;
+  --color-bg-light: #F3F3F3;
+  --color-text-on-dark: #FDFDFD;
+  --font-main: 'Inter', sans-serif;
+}
+
+body {
+  background-color: var(--color-bg-light);
+  margin: 0;
+  font-family: var(--font-main);
+}
+
+#app-container {
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* --- СТРУКТУРА КОМПОНЕНТОВ --- */
+
+.component {
+  box-sizing: border-box;
+}
+
+.header, .experience-block {
+  width: 100%;
+}
+
+.content-row {
+  display: flex;
+  width: 100%;
+}
+
+/* --- СТИЛИЗАЦИЯ БЛОКОВ --- */
+
+.header {
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-on-dark);
+  padding: 60px;
+}
+
+.skills-block {
+  background-color: var(--color-bg-accent);
+  color: var(--color-text-on-dark);
+  flex: 0 0 60%;
+  padding: 40px 60px;
+}
+
+.empty-block {
+  flex: 0 0 40%;
+  background-color: var(--color-bg-light);
+}
+
+.experience-block {
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-on-dark);
+  padding: 40px 60px;
+}
+
+/* --- ТИПОГРАФИКА --- */
+
+.header__name {
+  font-size: 52px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin: 0 0 10px 0;
+}
+
+.header__title, .header__contact-item {
+  font-size: 24px;
+  font-weight: 400;
+  margin: 4px 0;
+}
+
+.skills-block__header, .experience-block__header {
+  font-size: 48px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 0 0 20px 0;
+}
+
+.skills-block__body, .experience-block__body {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+}

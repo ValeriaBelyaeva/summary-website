@@ -1,106 +1,119 @@
-/**
- * @fileoverview Main entry point for the application.
- */
+// Импортируем класс Grid, предполагая, что он находится рядом
+// import Grid from './Grid.js';
 
-import { loadContent } from './services/contentLoader.js';
-import { Header } from '../components/Header.js';
-import { SkillsBlock } from '../content/SkillsBlock.js';
-import { ExperienceBlock } from '../components/ExperienceBlock.js';
-import { Grid } from './Grid.js';
-import { throttle, debounce } from '../utils/events.js';
-
-class App {
-    constructor(rootSelector) {
-        this.rootElement = document.querySelector(rootSelector);
-        this.grid = new Grid();
-        this.renderedElements = []; // Store rendered DOM elements
+// --- ДЛЯ ДЕМОНСТРАЦИИ: Класс Grid с пустыми методами, чтобы не было ошибок ---
+// В реальном проекте здесь будет ваш полноценный класс Grid
+class Grid {
+    constructor() { console.log("Grid Initialized"); }
+    startInitialDraw(startPoints, length = 300) {
+        if (!startPoints || !startPoints.forEach) {
+            console.error("Grid Error: startPoints is not a valid array.", startPoints);
+            return;
+        }
+        console.log(`Grid: Drawing initial lines from ${startPoints.length} points.`);
+        startPoints.forEach(p => {
+            console.log(` -> Drawing from {x: ${p.x.toFixed(0)}, y: ${p.y.toFixed(0)}} down by ${length}px`);
+        });
     }
+}
+// --- КОНЕЦ ДЕМО-КЛАССА ---
 
-    async init() {
-        if (!this.rootElement) {
-            console.error('Root element not found.');
+/**
+ * Главный класс приложения, который управляет всем.
+ */
+class App {
+    constructor(containerSelector) {
+        this.container = document.querySelector(containerSelector);
+        if (!this.container) {
+            console.error(`App Error: Container "${containerSelector}" not found.`);
             return;
         }
 
-        // 1. Initialize the grid system first
-        this.grid.init(this.rootElement);
+        this.grid = new Grid();
+        this.init();
+    }
 
-        // 2. Load content
-        const contentData = await loadContent();
-        if (!contentData) return;
+    /**
+     * Асинхронно загружает данные. В реальном проекте здесь будет fetch.
+     * @returns {Promise<Object>} - Объект с данными для страницы.
+     */
+    async fetchData() {
+        console.log("Fetching data...");
+        // Имитация загрузки данных
+        return {
+            header: {
+                name: "СПИ-саллухе",
+                title: "ML Developer"
+            },
+            contacts: {
+                telegram: "TELEGRAM",
+                email: "email@example.com"
+            },
+            skills: {
+                header: "SKILLS",
+                body: "Lorem ipsum dolor sit amet, consectetur\nLorem ipsum dolor sit amet, consectetur"
+            },
+            experience: {
+                header: "EXPERIENCE",
+                body: "Lorem ipsum dolor sit amet, consectetur sit amet,\nLorem ipsum dolor sit amet"
+            }
+        };
+    }
 
-        // 3. Render all components (but keep them invisible for now)
-        this._renderComponents(contentData);
-
-        // 4. Build the static grid from the components' geometry
-        // We use a short timeout to ensure the browser has calculated layout
-        setTimeout(() => {
-            this.grid.buildFromComponents(this.renderedElements);
+    /**
+     * Заполняет DOM-элементы данными.
+     * @param {Object} data - Данные, полученные от fetchData.
+     */
+    populateContent(data) {
+        console.log("Populating content...");
+        this.container.querySelectorAll('[data-content-key]').forEach(element => {
+            const keyPath = element.dataset.contentKey;
+            // Простое получение вложенного значения по ключу "obj.key"
+            const value = keyPath.split('.').reduce((acc, key) => acc && acc[key], data);
             
-            // 5. Reveal the components now that the grid is "ready"
-            this._revealComponents();
-
-            // 6. Setup event listeners for resize
-            this._setupEventListeners();
-        }, 100); // A small delay is a robust way to wait for layout
-    }
-
-    _renderComponents(data) {
-        // We use a document fragment for efficient DOM insertion
-        const fragment = document.createDocumentFragment();
-
-        const header = new Header(data.header, data.contacts);
-        const headerEl = header.render();
-        
-        const skillsRow = this._createSkillsRow(data);
-        
-        const experience = new ExperienceBlock(data.experience);
-        const experienceEl = experience.render();
-
-        fragment.append(headerEl, skillsRow, experienceEl);
-        this.rootElement.appendChild(fragment);
-
-        // Store rendered elements for the grid to use
-        this.renderedElements = [headerEl, skillsRow, experienceEl];
-        
-        // Hide all components initially to wait for the grid
-        this.renderedElements.forEach(el => el.style.opacity = '0');
-    }
-    
-    _createSkillsRow(data) {
-        const skillsRow = document.createElement('div');
-        skillsRow.className = 'grid-row';
-        
-        const skillsComponent = new SkillsBlock(data.skills);
-        const emptyBlock = document.createElement('div');
-        emptyBlock.className = 'empty-block';
-        
-        skillsRow.append(skillsComponent.render(), emptyBlock);
-        return skillsRow;
-    }
-    
-    _revealComponents() {
-        this.renderedElements.forEach(el => {
-            // For now, always reveal components since we're not tracking specific segments
-            // In a more complex implementation, you'd track which segments belong to which component
-            el.style.transition = 'opacity 0.5s';
-            el.style.opacity = '1';
+            if (value) {
+                // Заменяем переносы строк на теги <br> для HTML
+                element.innerHTML = value.replace(/\n/g, '<br>');
+            }
         });
     }
 
-    _setupEventListeners() {
-        // On resize, we need to rebuild the components and the grid
-        // to get correct new coordinates.
-        window.addEventListener('resize', debounce(() => this.rebuild(), 250));
+    /**
+     * Инициализирует анимацию сетки.
+     */
+    initGridAnimation() {
+        console.log("Initializing grid animation...");
+        const headerElement = this.container.querySelector('.header');
+        
+        if (!headerElement) {
+            console.error("Grid Init Error: .header element not found.");
+            return;
+        }
+
+        const rect = headerElement.getBoundingClientRect();
+        const scrollY = window.scrollY;
+
+        // Вычисляем ТРИ стартовые точки на нижней границе хедера
+        const startPoints = [
+            { x: rect.left, y: rect.bottom + scrollY },
+            { x: rect.left + rect.width / 2, y: rect.bottom + scrollY },
+            { x: rect.right, y: rect.bottom + scrollY }
+        ];
+        
+        // Передаем вычисленные точки в метод отрисовки сетки
+        this.grid.startInitialDraw(startPoints);
     }
-    
-    rebuild() {
-        // A simple full rebuild on resize for this static version
-        this.rootElement.innerHTML = '';
-        this.init();
+
+    /**
+     * Главный метод инициализации приложения.
+     */
+    async init() {
+        const data = await this.fetchData();
+        this.populateContent(data);
+        this.initGridAnimation();
+        console.log("Application initialized successfully.");
     }
 }
 
-// Instantiate and start the application
-const app = new App('#app-container');
-app.init();
+// Запускаем приложение
+new App('#app-container');

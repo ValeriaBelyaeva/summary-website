@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Интерактивное Резюме</title>
@@ -10,12 +10,54 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Подключаем основной файл стилей -->
     <link rel="stylesheet" href="/src/styles/main.scss" />
-  </head>
-  <body>
-    <!-- Это контейнер, куда наше приложение будет рендерить все компоненты -->
-    <div id="app-container"></div>
+</head>
+<body>
+    <!-- 
+      Это главный контейнер приложения. 
+      В него помещена базовая структура страницы (скелет), 
+      которую JavaScript будет находить и заполнять данными.
+    -->
+    <div id="app-container">
+
+        <!-- Шапка (Header) -->
+        <header class="header component">
+            <div class="header__content">
+                <h1 class="header__name" data-content-key="header.name"></h1>
+                <p class="header__title" data-content-key="header.title"></p>
+                <div class="header__contacts">
+                    <p class="header__contact-item" data-content-key="contacts.telegram"></p>
+                    <p class="header__contact-item" data-content-key="contacts.email"></p>
+                </div>
+            </div>
+        </header>
+
+        <!-- 
+          Ряд с блоками Skills и Пустым.
+          Эта обертка `.content-row` необходима для создания flex-контейнера,
+          который разместит дочерние блоки в соотношении 60% / 40%.
+        -->
+        <div class="content-row">
+            <!-- Блок Навыков (Skills) -->
+            <section class="skills-block component">
+                <h2 class="skills-block__header" data-content-key="skills.header"></h2>
+                <div class="skills-block__body" data-content-key="skills.body"></div>
+            </section>
+            <!-- 
+              Пустой блок. Он не несет контента, но является ключевой частью 
+              геометрии макета и сетки.
+            -->
+            <div class="empty-block component"></div>
+        </div>
+
+        <!-- Блок Опыта (Experience) -->
+        <section class="experience-block component">
+            <h2 class="experience-block__header" data-content-key="experience.header"></h2>
+            <div class="experience-block__body" data-content-key="experience.body"></div>
+        </section>
+
+    </div>
     
     <!-- Это главный скрипт нашего приложения -->
     <script type="module" src="/src/scripts/main.js"></script>
-  </body>
+</body>
 </html>
