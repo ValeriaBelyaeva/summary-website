@@ -7,7 +7,7 @@
    ▸ Инициализирует анимированную сетку (Grid)
    ========================================================================== */
 
-   import Grid from './grid.js';
+   
 
    /* --------------------------- Константы ----------------------------------- */
    
@@ -17,7 +17,7 @@
    const MIN_WIDTH = 40;   // % — минимальная ширина палетки
    const MAX_WIDTH = 80;   // % — максимальная ширина палетки
    const CHAR_SCALE = 0.25; // сколько «% ширины» даём за каждый символ текста
-   
+    
    /* --------------------------- Инициализация -------------------------------- */
    
    document.addEventListener('DOMContentLoaded', init);
@@ -28,13 +28,15 @@
    
      await buildPalettes(container);
      centerLastPalette(container);
-     observeFade(container.querySelectorAll('.palette'));
-     window.addEventListener('resize', () => centerLastPalette(container));
- 
-     // запускаем анимированную сетку-водопад
-     new Grid(document.getElementById('grid'));
-   }
-   
+    observeFade(container.querySelectorAll('.palette'));
+    window.addEventListener('resize', () => centerLastPalette(container));
+
+    // запускаем анимированную сетку-водопад
+    new Grid(document.getElementById('grid'));
+
+    // двигаем фоновые цветовые пятна при скролле
+    initBlobScroll();
+  }
    /* --------------------------- Палетки ------------------------------------- */
    
    async function buildPalettes(root) {
@@ -178,3 +180,22 @@ function observeFade(nodes) {
     });
   }
    
+  
+/* ------------------------ Scroll-driven blobs ---------------------------- */
+
+function initBlobScroll() {
+    const update = () => {
+      const s = window.scrollY || window.pageYOffset;
+      document.body.style.setProperty('--blob1-x', `${20 + Math.sin(s * 0.001) * 15}%`);
+      document.body.style.setProperty('--blob1-y', `${30 + Math.cos(s * 0.0013) * 15}%`);
+      document.body.style.setProperty('--blob1-rx', `${40 + Math.sin(s * 0.0007) * 15}%`);
+      document.body.style.setProperty('--blob1-ry', `${50 + Math.cos(s * 0.0009) * 15}%`);
+      document.body.style.setProperty('--blob2-x', `${80 + Math.cos(s * 0.0008) * 15}%`);
+      document.body.style.setProperty('--blob2-y', `${70 + Math.sin(s * 0.0011) * 15}%`);
+      document.body.style.setProperty('--blob2-rx', `${45 + Math.cos(s * 0.001) * 15}%`);
+      document.body.style.setProperty('--blob2-ry', `${55 + Math.sin(s * 0.0008) * 15}%`);
+    };
+    window.addEventListener('scroll', () => requestAnimationFrame(update));
+    update();
+  }
+     
