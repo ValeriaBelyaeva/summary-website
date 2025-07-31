@@ -149,7 +149,7 @@ function observeFade(nodes) {
           entry.target.classList.toggle('is-visible', visible);
         });
       },
-      { threshold: [0, 0.25] }
+      { threshold: [0, 0.2] }
     );
   
     nodes.forEach(n => io.observe(n));
