@@ -21,6 +21,19 @@
 </head>
 
 <body>
+  <svg width="0" height="0" style="position:absolute">
+    <filter id="noiseFilter">
+      <!--  fractalNoise даёт «бумажный» равномерный шум                -->
+      <feTurbulence type="fractalNoise" baseFrequency="1.8"
+                    numOctaves="4" stitchTiles="stitch" />
+      <!--  чуть смягчим, чтобы точки были мягкие                       -->
+      <feGaussianBlur stdDeviation="0.4" />
+      <!--  на выходе — альфа-канал                                     -->
+      <feComponentTransfer>
+        <feFuncA type="discrete" tableValues="0 0.3" />
+      </feComponentTransfer>
+    </filter>
+  </svg>
   <div class="page-container">
     <!-- ───── Шапка ───────────────────────────────────────────── -->
     <header class="header">
