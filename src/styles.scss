@@ -162,9 +162,8 @@
     padding: 1.5rem 2rem;
     color: var(--c-light);
     opacity: 0;
-    transform: translateY(3rem);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-    will-change: opacity, transform;
+    transform: translateY(1rem);
+    transition: opacity 0.3s ease, transform 0.3s ease;
    
      &--dark {
        background-color: var(--c-dark);

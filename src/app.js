@@ -145,13 +145,22 @@ function observeFade(nodes) {
     const io = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
-          const visible = entry.intersectionRatio >= 0.25;
-          entry.target.classList.toggle('is-visible', visible);
+          if (entry.intersectionRatio >= 0.25) {
+            entry.target.classList.add('is-visible');
+          } else if (entry.boundingClientRect.top > 0) {
+            entry.target.classList.remove('is-visible');
+          }
         });
       },
-      { threshold: [0, 0.2] }
+      { threshold: 0.25 }
     );
-  
-    nodes.forEach(n => io.observe(n));
+
+    nodes.forEach(n => {
+      const rect = n.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        n.classList.add('is-visible');
+      } else {
+        io.observe(n);
+      }
+    });
   }
-   
