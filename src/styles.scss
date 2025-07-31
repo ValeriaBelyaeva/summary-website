@@ -38,12 +38,26 @@
       padding: 0;
       height: 100%;
       font-family: $font-body;
-      background: $paper-base;
-      color: var(--c-dark);
+      background: #0a0a0a;
+      color: var(--c-light);
       position: relative;         /* нужен контекст для before-слоя */
       overflow-x: hidden;         /* на всякий случай */
     }
     
+    /* цветные размытые пятна позади контента */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -2;
+      background:
+        radial-gradient(circle at 20% 30%, #00ff9f, transparent 70%),
+        radial-gradient(circle at 80% 70%, #ff007a, transparent 70%);
+      filter: blur(200px);
+      opacity: 0.7;
+    }
+
     /* псевдоэлемент-шум поверх цвета */
     body::before {
       content: '';
@@ -51,11 +65,11 @@
       inset: 0;
       pointer-events: none;
       z-index: -1;                /* остаётся под контентом */
-    
+
       /* Полупрозрачное белое полотно, на которое кладём шум */
-      background: $paper-base;
+      background: #ffffff;
       filter: url('#noiseFilter');
-      opacity: 0.55;              /* сила текстуры; подстройте 0.3-0.6 */
+      opacity: 0.03;              /* лёгкий шум для атмосферы */
     }
    
    img,
@@ -158,20 +172,22 @@
    
    /* Single Palette Card
       -------------------------------------------------------------------------- */
-      .palette {
-        padding: 1.5rem 2rem;
-        color: var(--c-light);
-        opacity: 0;
-        transform: translateY(1rem);
-        transition: opacity 0.3s ease, transform 0.3s ease;
-   
-     &--dark {
-       background-color: var(--c-dark);
-     }
-   
-     &--accent {
-       background-color: var(--c-accent);
-     }
+                           .palette {
+          padding: 1.5rem 2rem;
+          color: var(--c-light);
+          opacity: 0;
+          transform: translateY(1rem);
+          transition: opacity 0.3s ease, transform 0.3s ease;
+     
+       &--dark {
+         background-color: var(--c-dark);
+         box-shadow: 0 0 1.25rem rgba(0, 0, 0, 0.6);
+       }
+     
+       &--accent {
+         background-color: var(--c-accent);
+         box-shadow: 0 0 1.25rem rgba(255, 107, 0, 0.6);
+       }
    
      /* Появление по IntersectionObserver */
      &.is-visible {
