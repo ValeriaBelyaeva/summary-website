@@ -3,7 +3,7 @@
    ----------------------------------------------------------------------------
    ▸ Загружает palettes.json
    ▸ Генерирует палетки (title + text) с адаптивной шириной и случайным цветом
-   ▸ Добавляет fade-in через IntersectionObserver
+   ▸ Управляет fade-анимацией палеток через IntersectionObserver
    ▸ Инициализирует анимированную сетку (Grid)
    ========================================================================== */
 
@@ -27,7 +27,8 @@
      if (!container) return console.error(`Container #${CONTAINER_ID} not found`);
    
      await buildPalettes(container);
-     observeFadeIn(container.querySelectorAll('.palette'));
+     observeFade(container.querySelectorAll('.palette'));
+   
    
      // запускаем анимированную сетку-водопад
      new Grid(document.getElementById('grid'));
@@ -138,21 +139,19 @@
      return Math.min(max, Math.max(min, val));
    }
    
-   /* --------------------------- Fade-in ------------------------------------- */
-   
-   function observeFadeIn(nodes) {
-     const io = new IntersectionObserver(
-       entries => {
-         entries.forEach(entry => {
-           if (entry.isIntersecting) {
-             entry.target.classList.add('is-visible');
-             io.unobserve(entry.target);
-           }
-         });
-       },
-       { threshold: 0.1 }
-     );
-   
-     nodes.forEach(n => io.observe(n));
-   }
+/* --------------------------- Fade animation ------------------------------ */
+
+function observeFade(nodes) {
+    const io = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          const visible = entry.intersectionRatio >= 0.25;
+          entry.target.classList.toggle('is-visible', visible);
+        });
+      },
+      { threshold: [0, 0.25] }
+    );
+  
+    nodes.forEach(n => io.observe(n));
+  }
    
