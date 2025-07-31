@@ -62,6 +62,10 @@
        MAX_WIDTH
      );
      el.style.width = `${width}%`;
+
+     /* случайный правый отступ в пределах свободного пространства */
+     const free = 100 - width;  // % свободного места в контейнере
+     el.style.marginRight = `${Math.random() * free}%`;
    
      /* наполнение */
      if (title) {

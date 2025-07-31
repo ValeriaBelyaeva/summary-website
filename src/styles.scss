@@ -71,6 +71,14 @@
    /* ─────────────────────────────────────────────────────────────
       Layout Blocks
       ========================================================================== */
+
+   /* Page Container
+      -------------------------------------------------------------------------- */
+   .page-container {
+     width: 66.666%;
+     margin-left: auto;
+     margin-right: auto;
+   }
    
    /* Header
       -------------------------------------------------------------------------- */
@@ -79,7 +87,10 @@
      gap: 2rem;
      padding: 2rem 3rem;
      height: 33vh;           /* занимает 1/3 высоты экрана */
-   
+    
+     background-color: var(--c-dark); 
+     color: var(--c-light);            
+
      &__photo {
        flex: 0 0 160px;
        border-radius: 50%;
@@ -125,8 +136,7 @@
      display: flex;
      flex-direction: column;
      gap: 2.5rem;
-     padding: 4rem 3rem 6rem;
-     width: 66.666%;         /* 2/3 горизонтального пространства */
+     padding: 4rem 0 6rem;
    }
    
    /* Single Palette Card
@@ -173,6 +183,10 @@
       ========================================================================== */
    
    @media (max-width: 768px) {
+     .page-container {
+       width: 100%;
+     }
+
      .header {
        flex-direction: column;
        text-align: center;
@@ -180,7 +194,6 @@
      }
    
      .palettes {
-       width: 100%;
        padding: 3rem 1.5rem 5rem;
      }
    }
