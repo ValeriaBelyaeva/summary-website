@@ -27,9 +27,10 @@
      if (!container) return console.error(`Container #${CONTAINER_ID} not found`);
    
      await buildPalettes(container);
+     centerLastPalette(container);
      observeFade(container.querySelectorAll('.palette'));
-   
-   
+     window.addEventListener('resize', () => centerLastPalette(container));
+ 
      // запускаем анимированную сетку-водопад
      new Grid(document.getElementById('grid'));
    }
@@ -135,9 +136,21 @@
      return el;
    }
    
-   function clamp(val, min, max) {
-     return Math.min(max, Math.max(min, val));
-   }
+   
+    function clamp(val, min, max) {
+       return Math.min(max, Math.max(min, val));
+    }
+  
+    /* ----------------------- Bottom scroll padding ------------------------- */
+  
+    function centerLastPalette(root) {
+      const items = root.querySelectorAll('.palette');
+      const last = items[items.length - 1];
+      if (!last) return;
+      const pad = window.innerHeight / 2 - last.offsetHeight / 2;
+      root.style.paddingBottom = pad > 0 ? `${pad}px` : '';
+    }
+  
    
 /* --------------------------- Fade animation ------------------------------ */
 
@@ -164,3 +177,4 @@ function observeFade(nodes) {
       }
     });
   }
+   
