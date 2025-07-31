@@ -1,0 +1,54 @@
+name: CI
+
+# ───── Триггеры ────────────────────────────────────────────────────────────────
+on:
+  push:
+    branches: [main]          # проверяем каждую запись в main
+  pull_request:
+    branches: [main]          # и каждый PR в main
+
+# ───── Права (нужны для деплоя Pages) ──────────────────────────────────────────
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# ───── Джобы ───────────────────────────────────────────────────────────────────
+jobs:
+  build:                      # 1) сборка + стат-проверка
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'        # кэшируем node_modules
+
+      - name: Install deps
+        run: npm ci           # строгая установка зависимостей
+
+      - name: Lint code
+        run: npm run lint     # «eslint .» (скрипт зададим в package.json)
+
+      - name: Build project
+        run: npm run build    # «vite build» → /dist
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: dist          # отдаём статику следующей джобе
+
+  deploy:                     # 2) деплой на GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - name: Deploy to Pages
+        id: deploy
+        uses: actions/deploy-pages@v2

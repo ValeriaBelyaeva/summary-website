@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>Palette Layout Prototype</title>
+
+  <!-- Web-fonts -->
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Russo+One&family=Open+Sans:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+</head>
+
+<body>
+  <svg width="0" height="0" style="position:absolute">
+    <filter id="noiseFilter">
+      <!--  fractalNoise даёт «бумажный» равномерный шум                -->
+      <feTurbulence type="fractalNoise" baseFrequency="1.8"
+                    numOctaves="4" stitchTiles="stitch" />
+      <!--  чуть смягчим, чтобы точки были мягкие                       -->
+      <feGaussianBlur stdDeviation="0.4" />
+      <!--  на выходе — альфа-канал                                     -->
+      <feComponentTransfer>
+        <feFuncA type="discrete" tableValues="0 0.3" />
+      </feComponentTransfer>
+    </filter>
+  </svg>
+  <div class="page-container">
+    <!-- ───── Шапка ───────────────────────────────────────────── -->
+    <header class="header">
+      <div class="header__photo">
+        <!-- временное изображение; замените при необходимости -->
+        <img
+          src="assets/avatar.jpg"
+          alt="Фото автора"
+          width="160"
+          height="160"
+          loading="lazy"
+        />
+      </div>
+
+      <div class="header__contacts">
+        <h1 class="header__title">Беляева Валерия Андреевна</h1>
+        <p class="header__email">
+          <a href="mailto:lera.belyayeva.2006@mail.ru">lera.belyayeva.2006@mail.ru</a>
+        </p>
+        <p class="header__phone">
+          <a href="tel:+79675527010">+7 (967) 552-70-10</a>
+        </p>
+      </div>
+    </header>
+
+    <!-- ───── Контейнер палеток (заполняется JS) ──────────────── -->
+    <main id="palettes" class="palettes" role="list"></main>
+  </div>
+
+  <!-- ───── Canvas: фоновая сетка-«водопад» ─────────────────── -->
+  <canvas id="grid" class="grid" aria-hidden="true"></canvas>
+
+  <!-- ───── Основной модуль + стили (Vite) ──────────────────── -->
+  <script type="module">
+    /* Vite подхватит SCSS и JS как отдельные чанки */
+    import './styles.scss';
+    import './app.js';
+  </script>
+</body>
+</html>
