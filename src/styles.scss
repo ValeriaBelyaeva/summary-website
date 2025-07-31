@@ -20,44 +20,78 @@
      --c-light: #{$color-light};
      --c-accent: #{$color-accent};
      --transition-base: #{$transition-base};
+     --glow-dark: rgba(17, 17, 17, 0.6);
+     --glow-accent: rgba(255, 107, 0, 0.6);
    }
    
    /* ─────────────────────────────────────────────────────────────
       Mini Reset
       ========================================================================== */
    
-   *,
-   *::before,
-   *::after {
-     box-sizing: border-box;
-   }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      
+      html,
+       body {
+         margin: 0;
+         padding: 0;
+         height: 100%;
+         font-family: $font-body;
+         background: #0a0a0a;
+         color: var(--c-light);
+         position: relative;         /* нужен контекст для before-слоя */
+         z-index: 0;                 /* создаём новый стековый контекст */
+         overflow-x: hidden;         /* на всякий случай */
+       }
    
-       html,
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: $font-body;
-      background: #0a0a0a;
-      color: var(--c-light);
-      position: relative;         /* нужен контекст для before-слоя */
-      z-index: 0;                 /* создаём новый стековый контекст */
-      overflow-x: hidden;         /* на всякий случай */
-    }
-    
+       body {
+         --blob1-x: 20%;
+         --blob1-y: 30%;
+         --blob1-rx: 40%;
+         --blob1-ry: 50%;
+         --blob2-x: 80%;
+         --blob2-y: 70%;
+         --blob2-rx: 45%;
+         --blob2-ry: 55%;
+       }
+   
+       /* цветные размытые пятна позади контента */
+       body::after {
+         content: '';
+         position: fixed;
+         inset: 0;
+         pointer-events: none;
+         z-index: -2;
+         background:
+           radial-gradient(
+             ellipse var(--blob1-rx) var(--blob1-ry) at var(--blob1-x) var(--blob1-y),
+             #ff6b00,
+             transparent 70%
+           ),
+           radial-gradient(
+             ellipse var(--blob2-rx) var(--blob2-ry) at var(--blob2-x) var(--blob2-y),
+             #ff007a,
+             transparent 70%
+           );
+         filter: blur(200px);
+         opacity: 1.0;
+       }
     /* цветные размытые пятна позади контента */
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: -2;
-      background:
-        radial-gradient(circle at 20% 30%, #ff6b00, transparent 70%),
-        radial-gradient(circle at 80% 70%, #ff007a, transparent 70%);
-      filter: blur(200px);
-      opacity: 0.4;
-    }
+    body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: -1;                /* остаётся под контентом */
+  
+        /* Полупрозрачное белое полотно, на которое кладём шум */
+        background: #ffffff;
+        filter: url('#noiseFilter');
+        opacity: 0.03;              /* лёгкий шум для атмосферы */
+      }
 
     /* псевдоэлемент-шум поверх цвета */
     body::before {
@@ -184,23 +218,23 @@
    
    /* Single Palette Card
       -------------------------------------------------------------------------- */
-                           .palette {
-          padding: 1.5rem 2rem;
-          color: var(--c-light);
-          opacity: 0;
-          transform: translateY(1rem);
-          transition: opacity 0.3s ease, transform 0.3s ease;
-     
-       &--dark {
-         background-color: var(--c-dark);
-         box-shadow: 0 0 1.25rem rgba(0, 0, 0, 0.6);
-       }
-     
-       &--accent {
-         background-color: var(--c-accent);
-         box-shadow: 0 0 1.25rem rgba(255, 107, 0, 0.6);
-       }
-   
+      .palette {
+        padding: 1.5rem 2rem;
+        color: var(--c-light);
+        opacity: 0;
+        transform: translateY(1rem);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+
+     &--dark {
+       background-color: var(--c-dark);
+       box-shadow: 0 0 1.25rem var(--glow-dark);
+     }
+
+     &--accent {
+       background-color: var(--c-accent);
+       box-shadow: 0 0 1.25rem var(--glow-accent);
+     }
+
      /* Появление по IntersectionObserver */
      &.is-visible {
         opacity: 1;
