@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>Palette Layout Prototype</title>
+
+  <!-- Web-fonts (опционально) -->
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+</head>
+
+<body>
+  <!-- ───── Шапка ───────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header__photo">
+      <!-- временное изображение; замените при необходимости -->
+      <img
+        src="assets/avatar.jpg"
+        alt="Фото автора"
+        width="160"
+        height="160"
+        loading="lazy"
+      />
+    </div>
+
+    <div class="header__contacts">
+      <h1 class="header__title">Имя Фамилия</h1>
+      <p class="header__email">
+        <a href="mailto:you@example.com">you@example.com</a>
+      </p>
+      <p class="header__phone">
+        <a href="tel:+1234567890">+1 234 567-89-00</a>
+      </p>
+    </div>
+  </header>
+
+  <!-- ───── Canvas: фоновая сетка-«водопад» ─────────────────── -->
+  <canvas id="grid" class="grid" aria-hidden="true"></canvas>
+
+  <!-- ───── Контейнер палеток (заполняется JS) ──────────────── -->
+  <main id="palettes" class="palettes" role="list"></main>
+
+  <!-- ───── Основной модуль + стили (Vite) ──────────────────── -->
+  <script type="module">
+    /* Vite подхватит SCSS и JS как отдельные чанки */
+    import './styles.scss';
+    import './app.js';
+  </script>
+</body>
+</html>
