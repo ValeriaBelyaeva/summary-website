@@ -7,7 +7,7 @@
    ▸ Инициализирует анимированную сетку (Grid)
    ========================================================================== */
 
-   import Grid from './grid.js';
+   
 
    /* --------------------------- Константы ----------------------------------- */
    
@@ -30,9 +30,6 @@
      centerLastPalette(container);
      observeFade(container.querySelectorAll('.palette'));
      window.addEventListener('resize', () => centerLastPalette(container));
- 
-     // запускаем анимированную сетку-водопад
-     new Grid(document.getElementById('grid'));
    }
    
    /* --------------------------- Палетки ------------------------------------- */

@@ -41,6 +41,7 @@
       background: #0a0a0a;
       color: var(--c-light);
       position: relative;         /* нужен контекст для before-слоя */
+      z-index: 0;                 /* создаём новый стековый контекст */
       overflow-x: hidden;         /* на всякий случай */
     }
     
@@ -52,10 +53,10 @@
       pointer-events: none;
       z-index: -2;
       background:
-        radial-gradient(circle at 20% 30%, #00ff9f, transparent 70%),
+        radial-gradient(circle at 20% 30%, #ff6b00, transparent 70%),
         radial-gradient(circle at 80% 70%, #ff007a, transparent 70%);
       filter: blur(200px);
-      opacity: 0.7;
+      opacity: 0.4;
     }
 
     /* псевдоэлемент-шум поверх цвета */
@@ -118,50 +119,61 @@
    .header {
      @include flex-center(row);
      gap: 2rem;
-     padding: 2rem 3rem 0;
+     padding: 2rem 3rem;
      background-color: var(--c-dark); 
-     color: var(--c-light);            
+     color: var(--c-light);
+     justify-content: center;
+     align-items: center;
+     box-shadow: 0 0 1.25rem rgba(0, 0, 0, 0.6);
 
      &__photo {
        flex: 0 0 160px;
+       width: 160px;
+       height: 160px;
        border-radius: 50%;
        overflow: hidden;
+       box-shadow: 0 0 2rem rgba(255, 255, 255, 0.1);
      }
    
      &__contacts {
        display: flex;
        flex-direction: column;
-       gap: 0.1rem;
+       gap: 0.5rem;
+       text-align: left;
+       flex: 1;
+       max-width: 400px;
      }
    
      &__title {
-       margin: 0;
+       margin: 0 0 0.5rem;
        font-family: $font-heading;
-       font-size: 2rem;
-       line-height: 1.2;
+       font-size: 2.5rem;
+       line-height: 1.1;
        font-weight: 400;
+       letter-spacing: -0.02em;
+     }
+   
+     &__email,
+     &__phone {
+       margin: 0;
+       font-size: 1.1rem;
+       line-height: 1.4;
+       opacity: 0.9;
      }
    
      a {
        color: inherit;
        text-decoration: none;
+       transition: opacity 0.2s ease;
    
        &:hover {
-         text-decoration: underline;
+         opacity: 0.7;
+         text-decoration: none;
        }
      }
    }
    
-   /* Canvas Grid
-      -------------------------------------------------------------------------- */
-   .grid {
-     position: fixed;
-     inset: 0;
-     width: 100%;
-     height: 100%;
-     z-index: -1;            /* отправляем под контент */
-     pointer-events: none;
-   }
+
    
    /* Palettes container
       -------------------------------------------------------------------------- */
